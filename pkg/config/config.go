@@ -157,7 +157,7 @@ type Archive struct {
 type Release struct {
 	GitHub       Repo   `yaml:",omitempty"`
 	Draft        bool   `yaml:",omitempty"`
-	Prerelease   bool   `yaml:",omitempty"`
+	Prerelease   string `yaml:",omitempty"`
 	Disable      bool   `yaml:",omitempty"`
 	NameTemplate string `yaml:"name_template,omitempty"`
 }

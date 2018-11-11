@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"net/url"
 	"os"
+	"regexp"
 
 	"github.com/apex/log"
 	"github.com/google/go-github/github"
@@ -94,12 +95,32 @@ func (c *githubClient) CreateRelease(ctx *context.Context, body string) (int64, 
 	if err != nil {
 		return 0, err
 	}
+	preRelease := false
+	switch ctx.Config.Release.Prerelease {
+	case "true":
+		log.Infof("Pre-release set to true")
+		preRelease = true
+	case "auto":
+		rx, err := regexp.Compile(`-{1}((0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$`)
+		if err != nil {
+			log.Errorf("Failed to compile regex to check pre-release: %s", err)
+			break
+		}
+
+		matched := rx.MatchString(ctx.Git.CurrentTag)
+		log.Infof("Pre-Release was detected for tag %s: %v", ctx.Git.CurrentTag, matched)
+		if matched {
+			preRelease = matched
+		}
+	default:
+		log.Infof("Pre-release set to false")
+	}
 	var data = &github.RepositoryRelease{
 		Name:       github.String(title),
 		TagName:    github.String(ctx.Git.CurrentTag),
 		Body:       github.String(body),
 		Draft:      github.Bool(ctx.Config.Release.Draft),
-		Prerelease: github.Bool(ctx.Config.Release.Prerelease),
+		Prerelease: github.Bool(preRelease),
 	}
 	release, _, err = c.client.Repositories.GetReleaseByTag(
 		ctx,
