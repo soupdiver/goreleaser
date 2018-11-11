@@ -27,3 +27,4 @@ release:
     name: goreleaser
   prerelease: auto
 
+
