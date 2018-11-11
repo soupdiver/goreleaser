@@ -26,3 +26,4 @@ release:
     owner: soupdiver
     name: goreleaser
   prerelease: auto
+
