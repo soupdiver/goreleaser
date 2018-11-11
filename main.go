@@ -111,6 +111,7 @@ func releaseProject(options releaseOptions) error {
 	if err != nil {
 		return err
 	}
+	log.Debugf("%v", cfg.Release.Prerelease)
 	ctx, cancel := context.NewWithTimeout(cfg, options.Timeout)
 	defer cancel()
 	ctx.Parallelism = options.Parallelism
